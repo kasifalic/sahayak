@@ -31,3 +31,6 @@ Thumbs.db
 .idea/
 *.tmp
 *.temp
+
+node_modules/
+build/
