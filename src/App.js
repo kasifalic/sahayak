@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { DEFAULT_TOPICS, NCERT_SUBJECTS_BY_GRADE, GRADES } from './utils/constants';
 import AIAssistantFloating from './components/AI/AIAssistantFloating';
 import LearningWindow from './components/Learning/LearningWindow';
 import PrepareLessonWindow from './components/Preparation/PrepareLessonWindow';
+import LoginForm from './components/Auth/LoginForm';
+import WelcomeSetup from './components/Auth/WelcomeSetup';
 
 // Simple Loading Spinner
 const LoadingSpinner = ({ size = 'medium', message = 'Loading...' }) => {
@@ -239,6 +242,179 @@ const CreateCurriculum = () => {
     return monthlyPlan;
   };
 
+  const printMonthlyPlan = () => {
+    const printContent = document.getElementById('monthly-teaching-plan');
+    if (!printContent) return;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Sahayak Monthly Teaching Plan</title>
+          <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              margin: 8px;
+              line-height: 1.3;
+              color: #1f2937;
+              background: #ffffff;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 16px;
+              padding: 12px 0;
+              background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+              color: white;
+              border-radius: 8px;
+            }
+            .main-title {
+              font-size: 20px;
+              font-weight: 700;
+              margin-bottom: 4px;
+              letter-spacing: -0.025em;
+            }
+            .subtitle {
+              font-size: 13px;
+              opacity: 0.9;
+              margin-bottom: 2px;
+              font-weight: 400;
+            }
+            .grade-info {
+              font-size: 12px;
+              opacity: 0.8;
+              font-weight: 300;
+            }
+            .month-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 8px;
+              margin-top: 8px;
+            }
+            .month-card {
+              background: #ffffff;
+              border: 1px solid #e5e7eb;
+              border-radius: 6px;
+              padding: 10px;
+              page-break-inside: avoid;
+              box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            }
+            .month-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 8px;
+              padding-bottom: 4px;
+              border-bottom: 1px solid #f3f4f6;
+            }
+            .month-title {
+              font-size: 15px;
+              font-weight: 600;
+              color: #1f2937;
+            }
+            .semester-badge {
+              padding: 2px 6px;
+              border-radius: 8px;
+              font-size: 10px;
+              font-weight: 500;
+              text-transform: uppercase;
+              letter-spacing: 0.025em;
+            }
+            .semester-1 {
+              background-color: #dcfce7;
+              color: #166534;
+            }
+            .semester-2 {
+              background-color: #dbeafe;
+              color: #1e40af;
+            }
+            .subject-section {
+              margin-bottom: 8px;
+            }
+            .subject-section:last-child {
+              margin-bottom: 0;
+            }
+            .subject-title {
+              font-weight: 600;
+              color: #374151;
+              font-size: 12px;
+              margin-bottom: 3px;
+              text-transform: uppercase;
+              letter-spacing: 0.025em;
+            }
+            .topic-item {
+              display: flex;
+              align-items: flex-start;
+              margin-bottom: 2px;
+              font-size: 11px;
+            }
+            .topic-bullet {
+              width: 3px;
+              height: 3px;
+              background-color: #3b82f6;
+              border-radius: 50%;
+              margin-top: 4px;
+              margin-right: 6px;
+              flex-shrink: 0;
+            }
+            .topic-content {
+              flex: 1;
+            }
+            .topic-text {
+              color: #374151;
+              line-height: 1.2;
+              font-weight: 400;
+            }
+            .chapter-text {
+              color: #6b7280;
+              font-size: 9px;
+              margin-top: 1px;
+              font-style: italic;
+            }
+            @media print {
+              body { 
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+              .header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+              .month-card { 
+                break-inside: avoid;
+                page-break-inside: avoid;
+              }
+              .month-grid {
+                grid-template-columns: repeat(3, 1fr);
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="main-title">🎓 Sahayak Monthly Teaching Plan</div>
+            <div class="subtitle">AI-Powered Multi-Grade Teaching Assistant</div>
+            <div class="grade-info">Grade ${curriculum.grade} NCERT Curriculum • Generated on ${curriculum.generatedAt}</div>
+          </div>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
+
   const generateChapterNumbers = (start, end) => {
     const chapters = [];
     for (let i = start + 1; i <= end; i++) {
@@ -346,12 +522,6 @@ const CreateCurriculum = () => {
               </div>
               <div className="flex space-x-3">
                 <Button 
-                  onClick={() => window.print()}
-                  variant="secondary"
-                >
-                  🖨️ Print
-                </Button>
-                <Button 
                   onClick={() => setCurriculum(null)}
                 >
                   ✨ Create New
@@ -396,14 +566,23 @@ const CreateCurriculum = () => {
 
           {/* Monthly Plan */}
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">📅 Monthly Teaching Plan</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-900">📅 Monthly Teaching Plan</h3>
+              <Button 
+                onClick={printMonthlyPlan}
+                variant="secondary"
+                className="flex items-center space-x-2"
+              >
+                🖨️ Print Teaching Plan
+              </Button>
+            </div>
+            <div id="monthly-teaching-plan" className="month-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Object.entries(curriculum.monthlyPlan).map(([month, plan]) => (
-                <div key={month} className="bg-white rounded-xl p-6 shadow-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-gray-900">{month}</h4>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      plan.semester === 1 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                <div key={month} className="month-card bg-white rounded-xl p-6 shadow-lg">
+                  <div className="month-header flex items-center justify-between mb-4">
+                    <h4 className="month-title text-lg font-semibold text-gray-900">{month}</h4>
+                    <span className={`semester-badge px-2 py-1 rounded-full text-xs font-medium ${
+                      plan.semester === 1 ? 'semester-1 bg-green-100 text-green-800' : 'semester-2 bg-blue-100 text-blue-800'
                     }`}>
                       Semester {plan.semester}
                     </span>
@@ -411,15 +590,15 @@ const CreateCurriculum = () => {
                   
                   <div className="space-y-4">
                     {Object.entries(plan.subjects).map(([subject, details]) => (
-                      <div key={subject}>
-                        <h5 className="font-medium text-gray-800 text-sm mb-2">{subject}</h5>
+                      <div key={subject} className="subject-section">
+                        <h5 className="subject-title font-medium text-gray-800 text-sm mb-2">{subject}</h5>
                         <div className="space-y-1">
                           {details.topics.map((topic, index) => (
-                            <div key={index} className="flex items-start text-sm">
-                              <span className="w-1 h-1 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                              <div className="flex-1">
-                                <div className="text-gray-700">{topic}</div>
-                                <div className="text-gray-500 text-xs">{details.chapters[index]}</div>
+                            <div key={index} className="topic-item flex items-start text-sm">
+                              <span className="topic-bullet w-1 h-1 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                              <div className="topic-content flex-1">
+                                <div className="topic-text text-gray-700">{topic}</div>
+                                <div className="chapter-text text-gray-500 text-xs">{details.chapters[index]}</div>
                               </div>
                             </div>
                           ))}
@@ -439,7 +618,7 @@ const CreateCurriculum = () => {
 
 // Enhanced Dashboard component
 const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClick }) => {
-  const { user, logout } = useApp();
+  const { user, logout } = useAuth();
   const [currentView, setCurrentView] = useState('dashboard');
 
   const menuItems = [
@@ -570,7 +749,7 @@ const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClic
 
 // Main App component
 const AppContent = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClick }) => {
-  const { isAuthenticated, loading } = useApp();
+  const { isAuthenticated, profileCompleted, loading, completeProfile } = useAuth();
 
   if (loading) {
     return (
@@ -580,7 +759,18 @@ const AppContent = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonCli
     );
   }
 
-  return isAuthenticated ? <Dashboard aiOpen={aiOpen} setAiOpen={setAiOpen} onLearnConceptClick={onLearnConceptClick} onPrepareLessonClick={onPrepareLessonClick} /> : <MockLogin />;
+  // If not authenticated, show login
+  if (!isAuthenticated) {
+    return <LoginForm />;
+  }
+
+  // If authenticated but profile not completed, show welcome setup
+  if (!profileCompleted) {
+    return <WelcomeSetup onComplete={completeProfile} />;
+  }
+
+  // If authenticated and profile completed, show dashboard
+  return <Dashboard aiOpen={aiOpen} setAiOpen={setAiOpen} onLearnConceptClick={onLearnConceptClick} onPrepareLessonClick={onPrepareLessonClick} />;
 };
 
 function App() {
@@ -598,24 +788,26 @@ function App() {
   
   return (
     <div className="App">
-      <AppProvider>
-        <AppContent 
-          aiOpen={aiOpen} 
-          setAiOpen={setAiOpen} 
-          onLearnConceptClick={handleLearnConceptClick}
-          onPrepareLessonClick={handlePrepareLessonClick}
-        />
-        {/* Floating AI Assistant */}
-        <AIAssistantFloating open={aiOpen} setOpen={setAiOpen} />
-        {/* Learning Window */}
-        <LearningWindow isOpen={learningWindowOpen} onClose={() => setLearningWindowOpen(false)} />
-        {/* Prepare Lesson Window */}
-        <PrepareLessonWindow 
-          isOpen={prepareLessonOpen} 
-          onClose={() => setPrepareLessonOpen(false)}
-          selectedGrades={[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]} // Mock grades, you can get this from user context
-        />
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <AppContent 
+            aiOpen={aiOpen} 
+            setAiOpen={setAiOpen} 
+            onLearnConceptClick={handleLearnConceptClick}
+            onPrepareLessonClick={handlePrepareLessonClick}
+          />
+          {/* Floating AI Assistant */}
+          <AIAssistantFloating open={aiOpen} setOpen={setAiOpen} />
+          {/* Learning Window */}
+          <LearningWindow isOpen={learningWindowOpen} onClose={() => setLearningWindowOpen(false)} />
+          {/* Prepare Lesson Window */}
+          <PrepareLessonWindow 
+            isOpen={prepareLessonOpen} 
+            onClose={() => setPrepareLessonOpen(false)}
+            selectedGrades={[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]} // Mock grades, you can get this from user context
+          />
+        </AppProvider>
+      </AuthProvider>
     </div>
   );
 }
