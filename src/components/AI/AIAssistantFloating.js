@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 import SahayakImg from '../../sahayak.png';
+import { sendChatMessage, generateSessionId } from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
 
 const TEACHER_FOCUSED_ANSWERS = [
   "Respected Teacher, I'm here to help you with your teaching needs. How can I assist you today?",
@@ -27,11 +29,13 @@ function isLessonPlanRequest(text) {
 }
 
 const AIAssistantFloating = ({ open, setOpen }) => {
+  const { user } = useAuth();
   const [messages, setMessages] = useState([
     { sender: 'ai', text: 'Respected Teacher, I am your AI Assistant. How can I help you with your teaching today?' }
   ]);
   const [input, setInput] = useState('');
-  const [lastContext, setLastContext] = useState('');
+  const [sessionId, setSessionId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -40,28 +44,56 @@ const AIAssistantFloating = ({ open, setOpen }) => {
     }
   }, [messages, open]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+    
     const userMsg = { sender: 'user', text: input };
     setMessages(prev => [...prev, userMsg]);
+    const currentInput = input;
     setInput('');
+    setIsLoading(true);
 
-    setTimeout(() => {
-      let aiMsg;
-      if (isNewtonLawQuestion(input)) {
-        aiMsg = { sender: 'ai', text: NEWTON_EXPLANATION };
-        setLastContext('newton_explained');
-      } else if ((isLessonPlanRequest(input) || lastContext === 'newton_explained') && lastContext !== 'lesson_plan') {
-        aiMsg = { sender: 'ai', text: NEWTON_LESSON_PLAN };
-        setLastContext('lesson_plan');
-      } else {
-        aiMsg = { sender: 'ai', text: getTeacherFocusedAnswer() };
-        setLastContext('');
+    try {
+      // Use authenticated user ID or default
+      const userId = user?.uid || user?.email || "default_user";
+      
+      // Generate session ID if not exists
+      const currentSessionId = sessionId || generateSessionId();
+      if (!sessionId) {
+        setSessionId(currentSessionId);
       }
+
+      // Call the backend API
+      const response = await sendChatMessage(currentInput, userId, currentSessionId);
+      
+      // Add AI response to messages
+      const aiMsg = { 
+        sender: 'ai', 
+        text: response.response || 'Sorry, I encountered an issue. Please try again.' 
+      };
       setMessages(prev => [...prev, aiMsg]);
-      // Reset context after lesson plan to avoid looping
-      if (lastContext === 'lesson_plan') setLastContext('');
-    }, 800);
+      
+      // Update session ID if provided by backend
+      if (response.session_id && response.session_id !== currentSessionId) {
+        setSessionId(response.session_id);
+      }
+      
+    } catch (error) {
+      console.error('Chat API error:', error);
+      
+      // Fallback to mock responses if API fails
+      let fallbackMsg;
+      if (isNewtonLawQuestion(currentInput)) {
+        fallbackMsg = { sender: 'ai', text: NEWTON_EXPLANATION };
+      } else if (isLessonPlanRequest(currentInput)) {
+        fallbackMsg = { sender: 'ai', text: NEWTON_LESSON_PLAN };
+      } else {
+        fallbackMsg = { sender: 'ai', text: 'I apologize, but I\'m having trouble connecting to my knowledge base. Please try again in a moment, or check your internet connection.' };
+      }
+      setMessages(prev => [...prev, fallbackMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -73,7 +105,7 @@ const AIAssistantFloating = ({ open, setOpen }) => {
     setMessages([
       { sender: 'ai', text: 'Respected Teacher, I am your AI Assistant. How can I help you with your teaching today?' }
     ]);
-    setLastContext('');
+    // Keep session ID to maintain conversation context
   };
 
   return (
@@ -114,18 +146,28 @@ const AIAssistantFloating = ({ open, setOpen }) => {
             <input
               type="text"
               className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Ask about teaching..."
+              placeholder={isLoading ? "AI is thinking..." : "Ask about teaching..."}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={isLoading}
               aria-label="Type your question"
             />
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 flex items-center justify-center transition-all duration-200"
+              className={`rounded-full p-2 flex items-center justify-center transition-all duration-200 ${
+                isLoading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
               onClick={handleSend}
+              disabled={isLoading}
               aria-label="Send"
             >
-              <Send size={18} />
+              {isLoading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <Send size={18} />
+              )}
             </button>
           </div>
         </div>

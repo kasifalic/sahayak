@@ -48,6 +48,7 @@ export const APP_CONFIG = {
   VERSION: '1.0.0',
   SUPPORT_EMAIL: 'support@sahayak.edu',
   FEEDBACK_URL: 'https://forms.google.com/sahayak-feedback',
+  API_BASE_URL: 'https://agentic-ai-backend-1055718553765.us-central1.run.app'
 };
 
 // Default curriculum topics by grade (sample data)

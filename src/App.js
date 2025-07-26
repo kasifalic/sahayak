@@ -7,6 +7,7 @@ import LearningWindow from './components/Learning/LearningWindow';
 import PrepareLessonWindow from './components/Preparation/PrepareLessonWindow';
 import LoginForm from './components/Auth/LoginForm';
 import WelcomeSetup from './components/Auth/WelcomeSetup';
+import BackendTest from './components/API/BackendTest';
 
 // Simple Loading Spinner
 const LoadingSpinner = ({ size = 'medium', message = 'Loading...' }) => {
@@ -626,12 +627,17 @@ const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClic
     { id: 'curriculum', title: 'Create Curriculum', icon: '📚' },
     { id: 'learn', title: 'Learn Concept', icon: '🧠' },
     { id: 'prepare', title: 'Prepare Lessons', icon: '📝' },
-    { id: 'ai', title: 'AI Assistant', icon: '🤖' }
+    { id: 'ai', title: 'AI Assistant', icon: '🤖' },
+    { id: 'api-test', title: 'API Test', icon: '🔗' }
   ];
 
   const renderContent = () => {
     if (currentView === 'curriculum') {
       return <CreateCurriculum />;
+    }
+    
+    if (currentView === 'api-test') {
+      return <BackendTest />;
     }
     
     return (
