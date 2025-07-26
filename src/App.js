@@ -529,7 +529,17 @@ const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClic
               {menuItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setCurrentView(item.id)}
+                  onClick={() => {
+                    if (item.id === 'ai') {
+                      setAiOpen(true);
+                    } else if (item.id === 'learn') {
+                      onLearnConceptClick();
+                    } else if (item.id === 'prepare') {
+                      onPrepareLessonClick();
+                    } else {
+                      setCurrentView(item.id);
+                    }
+                  }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     currentView === item.id 
                       ? 'bg-blue-100 text-blue-700' 
