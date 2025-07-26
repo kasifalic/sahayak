@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { DEFAULT_TOPICS, NCERT_SUBJECTS_BY_GRADE, GRADES } from './utils/constants';
+import AIAssistantFloating from './components/AI/AIAssistantFloating';
+import LearningWindow from './components/Learning/LearningWindow';
+import PrepareLessonWindow from './components/Preparation/PrepareLessonWindow';
 
 // Simple Loading Spinner
 const LoadingSpinner = ({ size = 'medium', message = 'Loading...' }) => {
@@ -275,7 +278,7 @@ const CreateCurriculum = () => {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">📚 Build Your Teaching Plan</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">📚 Build Your Teaching Plan, Respected Teacher</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Create a comprehensive curriculum with NCERT book integration for your multi-grade classroom.
         </p>
@@ -435,7 +438,7 @@ const CreateCurriculum = () => {
 };
 
 // Enhanced Dashboard component
-const Dashboard = () => {
+const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClick }) => {
   const { user, logout } = useApp();
   const [currentView, setCurrentView] = useState('dashboard');
 
@@ -456,7 +459,7 @@ const Dashboard = () => {
       <div>
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.firstName}! 👋
+            Welcome back, Respected Teacher {user?.firstName}! 👋
           </h2>
           <p className="text-gray-600">
             Multi-Grade Teacher at {user?.schoolName}
@@ -475,24 +478,34 @@ const Dashboard = () => {
             <div 
               key={item.id} 
               className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-              onClick={() => setCurrentView(item.id)}
+              onClick={() => {
+                if (item.id === 'ai') {
+                  setAiOpen(true);
+                } else if (item.id === 'learn') {
+                  onLearnConceptClick();
+                } else if (item.id === 'prepare') {
+                  onPrepareLessonClick();
+                } else {
+                  setCurrentView(item.id);
+                }
+              }}
             >
               <div className="text-3xl mb-4">{item.icon}</div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-gray-600 text-sm">Click to explore this feature</p>
+              <p className="text-gray-600 text-sm">Click to explore this teaching tool</p>
             </div>
           ))}
         </div>
 
         <div className="bg-white rounded-xl p-8 shadow-lg">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">Your Multi-Grade Profile</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Your Teaching Profile</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div><span className="font-medium">Name:</span> {user?.firstName} {user?.lastName}</div>
+            <div><span className="font-medium">Name:</span> Respected Teacher {user?.firstName} {user?.lastName}</div>
             <div><span className="font-medium">Teaching Grades:</span> {user?.teachingGrades?.join(', ')}</div>
             <div><span className="font-medium">School:</span> {user?.schoolName}</div>
             <div><span className="font-medium">District:</span> {user?.district}</div>
             <div><span className="font-medium">Phone:</span> {user?.phoneNumber}</div>
-            <div><span className="font-medium">Classroom Type:</span> Multi-Grade</div>
+            <div><span className="font-medium">Classroom Type:</span> Multi-Grade Teaching</div>
           </div>
         </div>
       </div>
@@ -546,7 +559,7 @@ const Dashboard = () => {
 };
 
 // Main App component
-const AppContent = () => {
+const AppContent = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClick }) => {
   const { isAuthenticated, loading } = useApp();
 
   if (loading) {
@@ -557,14 +570,41 @@ const AppContent = () => {
     );
   }
 
-  return isAuthenticated ? <Dashboard /> : <MockLogin />;
+  return isAuthenticated ? <Dashboard aiOpen={aiOpen} setAiOpen={setAiOpen} onLearnConceptClick={onLearnConceptClick} onPrepareLessonClick={onPrepareLessonClick} /> : <MockLogin />;
 };
 
 function App() {
+  const [aiOpen, setAiOpen] = useState(false);
+  const [learningWindowOpen, setLearningWindowOpen] = useState(false);
+  const [prepareLessonOpen, setPrepareLessonOpen] = useState(false);
+  
+  const handleLearnConceptClick = () => {
+    setLearningWindowOpen(true);
+  };
+
+  const handlePrepareLessonClick = () => {
+    setPrepareLessonOpen(true);
+  };
+  
   return (
     <div className="App">
       <AppProvider>
-        <AppContent />
+        <AppContent 
+          aiOpen={aiOpen} 
+          setAiOpen={setAiOpen} 
+          onLearnConceptClick={handleLearnConceptClick}
+          onPrepareLessonClick={handlePrepareLessonClick}
+        />
+        {/* Floating AI Assistant */}
+        <AIAssistantFloating open={aiOpen} setOpen={setAiOpen} />
+        {/* Learning Window */}
+        <LearningWindow isOpen={learningWindowOpen} onClose={() => setLearningWindowOpen(false)} />
+        {/* Prepare Lesson Window */}
+        <PrepareLessonWindow 
+          isOpen={prepareLessonOpen} 
+          onClose={() => setPrepareLessonOpen(false)}
+          selectedGrades={[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]} // Mock grades, you can get this from user context
+        />
       </AppProvider>
     </div>
   );
