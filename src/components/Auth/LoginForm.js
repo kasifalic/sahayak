@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { signInWithGooglePopup, signInWithEmail, createUserWithEmail } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 
 const LoginForm = () => {
+  const { t } = useTranslation();
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -95,9 +97,9 @@ const LoginForm = () => {
             <span className="text-2xl text-white">🎓</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {isSignUp ? 'Join Sahayak' : 'Welcome to Sahayak'}
+                            {isSignUp ? t('auth.joinSahayak') : t('auth.welcomeToSahayak')}
           </h1>
-          <p className="text-gray-600">Your Multi-Grade Teaching Assistant</p>
+                        <p className="text-gray-600">{t('welcome.subtitle')}</p>
         </div>
 
         {error && (

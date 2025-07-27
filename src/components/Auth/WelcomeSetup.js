@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from '../Language/LanguageSelector';
 
 // Multi-Grade Selection Component
 const GradeSelectionModal = ({ isOpen, onClose, onSave, selectedGrades, setSelectedGrades }) => {
+  const { t } = useTranslation();
+  
   if (!isOpen) return null;
 
   const availableGrades = [2, 8, 9, 11, 12];
@@ -18,8 +22,8 @@ const GradeSelectionModal = ({ isOpen, onClose, onSave, selectedGrades, setSelec
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">📚 Select Your Teaching Grades</h2>
-        <p className="text-gray-600 mb-6">Choose the grades you teach in your multi-grade classroom:</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('gradeModal.title')}</h2>
+        <p className="text-gray-600 mb-6">{t('gradeModal.description')}</p>
         
         <div className="space-y-3 mb-6">
           {availableGrades.map(grade => (
@@ -42,15 +46,15 @@ const GradeSelectionModal = ({ isOpen, onClose, onSave, selectedGrades, setSelec
             onClick={onSave} 
             disabled={selectedGrades.length === 0}
             className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-          >
-            ✅ Save Selection
-          </button>
-          <button 
-            onClick={onClose}
-            className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors font-medium"
-          >
-            Cancel
-          </button>
+                      >
+              {t('gradeModal.saveSelection')}
+            </button>
+            <button 
+              onClick={onClose}
+              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors font-medium"
+            >
+              {t('gradeModal.cancel')}
+            </button>
         </div>
       </div>
     </div>
@@ -59,6 +63,7 @@ const GradeSelectionModal = ({ isOpen, onClose, onSave, selectedGrades, setSelec
 
 const WelcomeSetup = ({ onComplete }) => {
   const { currentUser } = useAuth();
+  const { t } = useTranslation();
   const [selectedGrades, setSelectedGrades] = useState([2]);
   const [showGradeModal, setShowGradeModal] = useState(false);
   
@@ -104,16 +109,19 @@ const WelcomeSetup = ({ onComplete }) => {
             <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl text-white">🎓</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Sahayak</h1>
-            <p className="text-gray-600">Your Multi-Grade Teaching Assistant</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('welcome.title')}</h1>
+            <p className="text-gray-600">{t('welcome.subtitle')}</p>
             {currentUser?.displayName && (
-              <p className="text-blue-600 font-medium mt-2">Hello, {userName}!</p>
+              <p className="text-blue-600 font-medium mt-2">{t('welcome.greeting', { name: userName })}</p>
             )}
           </div>
 
           {/* Grade Selection Display */}
+          {/* Language Selection */}
+          <LanguageSelector className="mb-6" size="small" />
+
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Selected Teaching Grades:</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">{t('welcome.gradeSelection')}</h3>
             <div className="flex flex-wrap gap-2 mb-3">
               {selectedGrades.length > 0 ? selectedGrades.map(grade => (
                 <span key={grade} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
@@ -127,7 +135,7 @@ const WelcomeSetup = ({ onComplete }) => {
               onClick={() => setShowGradeModal(true)}
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
             >
-              ⚙️ Change Grade Selection
+              {t('welcome.changeGradeSelection')}
             </button>
           </div>
           
@@ -135,7 +143,7 @@ const WelcomeSetup = ({ onComplete }) => {
             onClick={handleStartTeaching}
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium text-lg"
           >
-            🚀 Start Teaching Journey
+            {t('welcome.startTeaching')}
           </button>
         </div>
       </div>

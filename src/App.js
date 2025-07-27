@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { DEFAULT_TOPICS, NCERT_SUBJECTS_BY_GRADE, GRADES } from './utils/constants';
+import { useTranslation } from 'react-i18next';
+import { DEFAULT_TOPICS, NCERT_SUBJECTS_BY_GRADE } from './utils/constants';
 import AIAssistantFloating from './components/AI/AIAssistantFloating';
 import LearningWindow from './components/Learning/LearningWindow';
 import PrepareLessonWindow from './components/Preparation/PrepareLessonWindow';
 import LoginForm from './components/Auth/LoginForm';
 import WelcomeSetup from './components/Auth/WelcomeSetup';
 import BackendTest from './components/API/BackendTest';
+import LanguageDropdown from './components/Language/LanguageDropdown';
 
 // Simple Loading Spinner
 const LoadingSpinner = ({ size = 'medium', message = 'Loading...' }) => {
@@ -51,148 +53,14 @@ const Button = ({ children, onClick, disabled = false, size = 'medium', classNam
   );
 };
 
-// Multi-Grade Selection Component
-const GradeSelectionModal = ({ isOpen, onClose, onSave, selectedGrades, setSelectedGrades }) => {
-  if (!isOpen) return null;
 
-  const availableGrades = [2, 8, 9, 11, 12];
-
-  const handleGradeToggle = (grade) => {
-    if (selectedGrades.includes(grade)) {
-      setSelectedGrades(selectedGrades.filter(g => g !== grade));
-    } else {
-      setSelectedGrades([...selectedGrades, grade]);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">📚 Select Your Teaching Grades</h2>
-        <p className="text-gray-600 mb-6">Choose the grades you teach in your multi-grade classroom:</p>
-        
-        <div className="space-y-3 mb-6">
-          {availableGrades.map(grade => (
-            <label key={grade} className="flex items-center space-x-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedGrades.includes(grade)}
-                onChange={() => handleGradeToggle(grade)}
-                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              />
-              <span className="text-gray-700">
-                Grade {grade} (Class {grade === 11 ? 'XI' : grade === 12 ? 'XII' : grade})
-              </span>
-            </label>
-          ))}
-        </div>
-
-        <div className="flex space-x-3">
-          <Button 
-            onClick={onSave} 
-            disabled={selectedGrades.length === 0}
-            size="large" 
-            className="flex-1"
-          >
-            ✅ Save Selection
-          </Button>
-          <Button 
-            onClick={onClose} 
-            variant="outline" 
-            size="large"
-          >
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Enhanced Mock Login Component
-const MockLogin = () => {
-  const { login } = useApp();
-  const [selectedGrades, setSelectedGrades] = useState([2, 8, 9]);
-  const [showGradeModal, setShowGradeModal] = useState(false);
-  
-  const handleMockLogin = () => {
-    if (selectedGrades.length === 0) {
-      setShowGradeModal(true);
-      return;
-    }
-
-    const mockUser = {
-      firstName: 'Priya',
-      lastName: 'Sharma',
-      phoneNumber: '9876543210',
-      teachingGrades: selectedGrades,
-      primaryGrade: selectedGrades[0],
-      schoolName: 'Government Primary School',
-      district: 'Rajgarh',
-      state: 'Madhya Pradesh'
-    };
-    login(mockUser);
-  };
-
-  const handleGradeSave = () => {
-    setShowGradeModal(false);
-    if (selectedGrades.length > 0) {
-      handleMockLogin();
-    }
-  };
-
-  return (
-    <>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl text-white">🎓</span>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Sahayak</h1>
-            <p className="text-gray-600">Your Multi-Grade Teaching Assistant</p>
-          </div>
-
-          {/* Grade Selection Display */}
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Selected Teaching Grades:</h3>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {selectedGrades.length > 0 ? selectedGrades.map(grade => (
-                <span key={grade} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                  Grade {grade}
-                </span>
-              )) : (
-                <span className="text-gray-500 text-sm">No grades selected</span>
-              )}
-            </div>
-            <button
-              onClick={() => setShowGradeModal(true)}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-            >
-              ⚙️ Change Grade Selection
-            </button>
-          </div>
-          
-          <Button onClick={handleMockLogin} size="large" className="w-full">
-            🚀 Start Teaching Journey
-          </Button>
-        </div>
-      </div>
-
-      <GradeSelectionModal
-        isOpen={showGradeModal}
-        onClose={() => setShowGradeModal(false)}
-        onSave={handleGradeSave}
-        selectedGrades={selectedGrades}
-        setSelectedGrades={setSelectedGrades}
-      />
-    </>
-  );
-};
+// MockLogin component removed as it's no longer needed
 
 // Enhanced Curriculum Component for Multi-Grade
 const CreateCurriculum = () => {
-  const { user } = useApp();
+  const { user } = useAuth();
   const [selectedOption, setSelectedOption] = useState('');
   const [selectedGrade, setSelectedGrade] = useState(user?.teachingGrades?.[0] || 2);
   const [loading, setLoading] = useState(false);
@@ -464,24 +332,33 @@ const CreateCurriculum = () => {
       {/* Grade Selection for Curriculum */}
       <div className="bg-white rounded-xl p-6 shadow-lg">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">📋 Select Grade for Curriculum</h3>
-        <div className="flex flex-wrap gap-3 mb-4">
-          {user?.teachingGrades?.map(grade => (
-            <button
-              key={grade}
-              onClick={() => setSelectedGrade(grade)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedGrade === grade 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Grade {grade}
-            </button>
-          ))}
-        </div>
-        <p className="text-sm text-gray-600">
-          Currently creating curriculum for: <span className="font-medium">Grade {selectedGrade}</span>
-        </p>
+        {user?.teachingGrades && user.teachingGrades.length > 0 ? (
+          <>
+            <div className="flex flex-wrap gap-3 mb-4">
+              {user.teachingGrades.map(grade => (
+                <button
+                  key={grade}
+                  onClick={() => setSelectedGrade(grade)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    selectedGrade === grade 
+                      ? 'bg-blue-600 text-white shadow-md' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Grade {grade}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-gray-600">
+              Currently creating curriculum for: <span className="font-medium text-blue-600">Grade {selectedGrade}</span>
+            </p>
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-gray-500 mb-2">No teaching grades selected</p>
+            <p className="text-sm text-gray-400">Please go back to the welcome page to select your teaching grades</p>
+          </div>
+        )}
       </div>
 
       {!curriculum ? (
@@ -620,15 +497,15 @@ const CreateCurriculum = () => {
 // Enhanced Dashboard component
 const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClick }) => {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const [currentView, setCurrentView] = useState('dashboard');
 
   const menuItems = [
-    { id: 'dashboard', title: 'Dashboard', icon: '🏠' },
-    { id: 'curriculum', title: 'Create Curriculum', icon: '📚' },
-    { id: 'learn', title: 'Learn Concept', icon: '🧠' },
-    { id: 'prepare', title: 'Prepare Lessons', icon: '📝' },
-    { id: 'ai', title: 'AI Assistant', icon: '🤖' },
-    { id: 'api-test', title: 'API Test', icon: '🔗' }
+    { id: 'dashboard', title: t('dashboard.menu.dashboard'), icon: '🏠' },
+    { id: 'curriculum', title: t('dashboard.menu.curriculum'), icon: '📚' },
+    { id: 'learn', title: t('dashboard.menu.learn'), icon: '🧠' },
+    { id: 'prepare', title: t('dashboard.menu.prepare'), icon: '📝' },
+    { id: 'ai', title: t('dashboard.menu.ai'), icon: '🤖' }
   ];
 
   const renderContent = () => {
@@ -636,18 +513,19 @@ const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClic
       return <CreateCurriculum />;
     }
     
-    if (currentView === 'api-test') {
-      return <BackendTest />;
-    }
-    
     return (
       <div>
         <div className="mb-8">
+          {/* Language Selector */}
+          <div className="flex justify-end mb-4">
+            <LanguageDropdown />
+          </div>
+          
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, Respected Teacher {user?.firstName}! 👋
+            {t('dashboard.welcomeBack', { name: user?.firstName || user?.name || user?.displayName || 'Teacher' })} 👋
           </h2>
           <p className="text-gray-600">
-            Multi-Grade Teacher at {user?.schoolName}
+            {user?.schoolName ? t('dashboard.multiGradeTeacher', { school: user.schoolName }) : t('dashboard.multiGradeTeacher', { school: '' })}
           </p>
           <div className="flex flex-wrap gap-2 mt-3">
             {user?.teachingGrades?.map(grade => (
@@ -677,7 +555,7 @@ const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClic
             >
               <div className="text-3xl mb-4">{item.icon}</div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-gray-600 text-sm">Click to explore this teaching tool</p>
+                                  <p className="text-gray-600 text-sm">{t('dashboard.clickToExplore')}</p>
             </div>
           ))}
         </div>
@@ -737,16 +615,16 @@ const Dashboard = ({ aiOpen, setAiOpen, onLearnConceptClick, onPrepareLessonClic
             </nav>
           </div>
           
-          <button
-            onClick={logout}
-            className="text-gray-600 hover:text-red-600 font-medium"
-          >
-            Logout
-          </button>
+                      <button
+              onClick={logout}
+              className="text-gray-600 hover:text-red-600 font-medium"
+            >
+              {t('dashboard.logout')}
+            </button>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 pt-6 pb-8">
         {renderContent()}
       </main>
     </div>

@@ -1,0 +1,94 @@
+{
+  "welcome": {
+    "title": "Welcome to Sahayak",
+    "subtitle": "Your Multi-Grade Teaching Assistant",
+    "greeting": "Hello, {{name}}!",
+    "gradeSelection": "Selected Teaching Grades:",
+    "changeGradeSelection": "⚙️ Change Grade Selection",
+    "languageSelection": "Select Language:",
+    "startTeaching": "🚀 Start Teaching Journey"
+  },
+  "gradeModal": {
+    "title": "📚 Select Your Teaching Grades",
+    "description": "Choose the grades you teach in your multi-grade classroom:",
+    "saveSelection": "✅ Save Selection",
+    "cancel": "Cancel"
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back, Respected Teacher {{name}}! 👋",
+    "multiGradeTeacher": "Multi-Grade Teacher at {{school}}",
+    "menu": {
+      "dashboard": "Dashboard",
+      "curriculum": "Create Curriculum",
+      "learn": "Learn Concept",
+      "prepare": "Prepare Lessons",
+      "ai": "AI Assistant",
+      "apiTest": "API Test"
+    },
+    "teachingProfile": "Your Teaching Profile",
+    "profile": {
+      "name": "Name:",
+      "teachingGrades": "Teaching Grades:",
+      "school": "School:",
+      "district": "District:",
+      "phone": "Phone:",
+      "classroomType": "Classroom Type:"
+    },
+    "logout": "Logout",
+    "clickToExplore": "Click to explore this teaching tool",
+    "language": "Language"
+  },
+  "ai": {
+    "title": "Teaching Assistant",
+    "placeholder": "Ask about teaching...",
+    "thinking": "AI is thinking...",
+    "initialMessage": "Respected Teacher, I am your AI Assistant. How can I help you with your teaching today?"
+  },
+  "curriculum": {
+    "title": "Grade {{grade}} NCERT Curriculum",
+    "generatedOn": "Generated on {{date}}",
+    "monthlyPlan": "📅 Monthly Teaching Plan",
+    "printPlan": "🖨️ Print Teaching Plan",
+    "createNew": "✨ Create New",
+    "ncertBooks": "📚 NCERT Books & Resources",
+    "downloadBooks": "Click to download NCERT books",
+    "someNotAvailable": "Some books may not be available",
+    "semester": "Semester {{number}}"
+  },
+  "auth": {
+    "joinSahayak": "Join Sahayak",
+    "welcomeToSahayak": "Welcome to Sahayak",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithEmail": "Or continue with email",
+    "emailAddress": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "dontHaveAccount": "Don't have an account? Sign up",
+    "signingIn": "Signing in...",
+    "pleaseWait": "Please wait..."
+  },
+  "grades": {
+    "grade1": "Grade 1 (Class I)",
+    "grade2": "Grade 2 (Class II)",
+    "grade3": "Grade 3 (Class III)",
+    "grade4": "Grade 4 (Class IV)",
+    "grade5": "Grade 5 (Class V)",
+    "grade6": "Grade 6 (Class VI)",
+    "grade7": "Grade 7 (Class VII)",
+    "grade8": "Grade 8 (Class VIII)",
+    "grade9": "Grade 9 (Class IX)",
+    "grade10": "Grade 10 (Class X)",
+    "grade11": "Grade 11 (Class XI)",
+    "grade12": "Grade 12 (Class XII)"
+  },
+  "languages": {
+    "en": "English",
+    "hi": "हिन्दी",
+    "ta": "தமிழ்",
+    "te": "తెలుగు",
+    "kn": "ಕನ್ನಡ"
+  }
+} 
