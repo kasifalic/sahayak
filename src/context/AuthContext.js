@@ -24,13 +24,9 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(user);
       
       if (user) {
-        // Check if user has completed profile setup
-        const storedProfile = localStorage.getItem(`sahayak_profile_${user.uid}`);
-        if (storedProfile) {
-          setUserProfile(JSON.parse(storedProfile));
-        } else {
-          setUserProfile(null); // Will trigger welcome setup
-        }
+        // Always show welcome page for grade selection on each login
+        // Remove stored profile check to ensure welcome page appears every time
+        setUserProfile(null); // Always trigger welcome setup
       } else {
         setUserProfile(null);
       }
@@ -46,6 +42,11 @@ export const AuthProvider = ({ children }) => {
       await signOutUser();
       setCurrentUser(null);
       setUserProfile(null);
+      
+      // Clear any stored profile data to ensure fresh start next login
+      if (currentUser?.uid) {
+        localStorage.removeItem(`sahayak_profile_${currentUser.uid}`);
+      }
     } catch (error) {
       console.error('Error signing out:', error);
     }

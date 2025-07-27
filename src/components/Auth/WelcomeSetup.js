@@ -68,7 +68,7 @@ const WelcomeSetup = ({ onComplete }) => {
       return;
     }
 
-    // Save user preferences and complete setup
+    // Save user preferences and complete setup for current session only
     const userProfile = {
       teachingGrades: selectedGrades,
       firstName: currentUser.displayName?.split(' ')[0] || 'Teacher',
@@ -81,8 +81,8 @@ const WelcomeSetup = ({ onComplete }) => {
       phoneNumber: 'Not provided'
     };
     
-    // Store in localStorage for now (could be Firebase later)
-    localStorage.setItem(`sahayak_profile_${currentUser.uid}`, JSON.stringify(userProfile));
+    // Don't store in localStorage to ensure welcome page shows every login
+    // localStorage.setItem(`sahayak_profile_${currentUser.uid}`, JSON.stringify(userProfile));
     
     onComplete(userProfile);
   };
